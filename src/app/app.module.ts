@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LocationService } from './location.service';
+import { WeatherApiService } from './weather-api.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -15,6 +16,7 @@ import { LocationService } from './location.service';
   providers: [
     LocationService,
     Geolocation,
+    WeatherApiService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })

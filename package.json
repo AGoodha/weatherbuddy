@@ -1,8 +1,7 @@
 {
   "name": "weatherbuddy",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "Artley G",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -24,9 +23,12 @@
     "@capacitor/haptics": "4.1.0",
     "@capacitor/keyboard": "4.1.1",
     "@capacitor/status-bar": "4.1.1",
+    "@ionic-native/geolocation": "^5.0.0-beta.14",
     "@ionic/angular": "^6.1.9",
+    "cordova-plugin-geolocation": "^4.1.0",
     "ionicons": "^6.0.3",
-    "rxjs": "~7.5.0",
+    "rxjs": "~7.5.7",
+    "rxjs-compat": "^6.6.7",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
   },
