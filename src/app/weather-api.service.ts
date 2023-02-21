@@ -81,4 +81,5 @@ export class WeatherApiService {
     return result;
 
   }
+  //TODO forcast will be collected on demand and used once a day then purged
 }
