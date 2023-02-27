@@ -33,19 +33,20 @@ export class WeatherApiService {
     const apiURL = "https://api.weather.gov/points/" + location;
     //TODO add interfaces to define the structure of the response to be more type safe
     //get url for detailed forecast
-    let firstUrl: any;
-    let forecasturl: string;
-    firstUrl = this.http.get(apiURL).subscribe((response: any) => {
+  
+    
+    
+    let firstUrl =  await this.http.get(apiURL).toPromise().then((response: any) => {
      let properties = response["properties"];
-      forecasturl = properties["forecast"];
-      console.log("forecasturl" + forecasturl);
+     let forecasturl = properties["forecast"];
+     // console.log("forecasturl" + forecasturl);
       return forecasturl;
     });
 
-
+    console.log("forecasturl1" + firstUrl)
     const sevendayforecast = new Array;
     //get detailed forecast
-    let result = this.http.get(firstUrl).subscribe((response: any) => {
+    let result = await this.http.get(firstUrl).toPromise().then((response: any) => {
       // console.log("log" + res)
       let properties = response["properties"];
       let periods = properties["periods"];
@@ -53,23 +54,23 @@ export class WeatherApiService {
       for (var i = 0; i < periods.length; i++) {
         let forecast = periods[i];
         let temp = forecast["temperature"];
-        // let name = forecast["name"];
-        // let starttime = JSON.stringify(forecast["startTime"]);
-        // let enddateindex = starttime.lastIndexOf(":") - 12;
-        // let date = starttime.substring(0, enddateindex);
-        // let endtime = forecast["endTime"];
-        // let isdaytime = forecast['isDaytime'];
-        // let windspeed = forecast["windSpeed"];
-        // let windDirection = forecast["windDirection"];
-        // let detailedForecast = forecast["detailedForecast"];
-        // var detailedForecastString = JSON.stringify(forecast["detailedForecast"])
-        // var percentprecipIndexEnd = detailedForecastString.toUpperCase().indexOf("%") - 1;
-        // var percentprecipIndexStart = percentprecipIndexEnd - 3;
-        // var percentprecip = (detailedForecast.substring(percentprecipIndexStart, percentprecipIndexEnd))
-        // if (percentprecip.length <= 0) {
-        //   percentprecip = "0";
-        // };
-        sevendayforecast.push([temp]);
+         let name = forecast["name"];
+        let starttime = JSON.stringify(forecast["startTime"]);
+        let enddateindex = starttime.lastIndexOf(":") - 12;
+        let date = starttime.substring(0, enddateindex);
+        let endtime = forecast["endTime"];
+        let isdaytime = forecast['isDaytime'];
+        let windspeed = forecast["windSpeed"];
+        let windDirection = forecast["windDirection"];
+        let detailedForecast = forecast["detailedForecast"];
+        var detailedForecastString = JSON.stringify(forecast["detailedForecast"])
+        var percentprecipIndexEnd = detailedForecastString.toUpperCase().indexOf("%") - 1;
+        var percentprecipIndexStart = percentprecipIndexEnd - 3;
+        var percentprecip = (detailedForecast.substring(percentprecipIndexStart, percentprecipIndexEnd))
+        if (percentprecip.length <= 0) {
+          percentprecip = "0";
+        };
+        sevendayforecast.push([name],[temp], [percentprecip]);
       }
       return sevendayforecast;
     })
@@ -78,5 +79,15 @@ export class WeatherApiService {
     return result;
 
   }
+  //Compare given time with timestamp of last API ccall only for first weather API call. 
+verifyRunLimiter(timestamp: number) {
+  var execute = false;
+  var firsttensecoinds= timestamp + 1000000;
+  if((timestamp <= firsttensecoinds)){
+    console.log("tensecondprint=" + firsttensecoinds)
+    var execute = true;
+  }
+  return execute;
+}
   //TODO forcast will be collected on demand and used once a day then purged
 }
