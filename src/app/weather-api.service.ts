@@ -70,7 +70,7 @@ export class WeatherApiService {
         if (percentprecip.length <= 0) {
           percentprecip = "0";
         };
-        sevendayforecast.push([name],[temp], [percentprecip]);
+        sevendayforecast.push([name + "Temperature" +temp + "Precipitation" + percentprecip]);
       }
       return sevendayforecast;
     })
