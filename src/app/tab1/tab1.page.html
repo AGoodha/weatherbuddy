@@ -9,8 +9,16 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
   </ion-header>
-  <div color="black" *ngFor="let forecast of forecastarray | keyvalue">
-    <ion-label>{{forecast.value}}</ion-label>
+  <div *ngFor="let forecast of processedForecastArray">
+    <ion-card [style.background-color]="forecast.precipitation > 50 ? 'red' : 'green'">
+      <ion-card-header>
+        <ion-card-title>{{ forecast.day }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-label>Temperature: {{forecast.temperature}}°C</ion-label>
+        <ion-label>Precipitation: {{forecast.precipitation}}%</ion-label>
+      </ion-card-content>
+    </ion-card>
   </div>
-  
+  //TODO find out why this is only displaying today.
 </ion-content>
