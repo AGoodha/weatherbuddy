@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
+    <ion-title class="black-text">
       Forecast
     </ion-title>
   </ion-toolbar>
@@ -12,13 +12,19 @@
   <div *ngFor="let forecast of processedForecastArray">
     <ion-card [style.background-color]="forecast.precipitation > 50 ? 'red' : 'green'">
       <ion-card-header>
-        <ion-card-title>{{ forecast.day }}</ion-card-title>
+        <ion-card-title class="black-text">{{ forecast.day }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-label>Temperature: {{forecast.temperature}}°C</ion-label>
-        <ion-label>Precipitation: {{forecast.precipitation}}%</ion-label>
+        <ion-label class="black-text">Temperature: {{forecast.temperature}}°C</ion-label>
+        <ion-label class="black-text">Precipitation: {{forecast.precipitation}}%</ion-label>
       </ion-card-content>
     </ion-card>
   </div>
-  //TODO find out why this is only displaying today.
+  <!-- TODO: Find out why this is only displaying today. -->
 </ion-content>
+
+<style>
+  .black-text {
+    color: black;
+  }
+</style>

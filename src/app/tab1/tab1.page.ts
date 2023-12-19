@@ -54,5 +54,4 @@ export class Tab1Page {
 
 
 
-//TODO finish run limter on wetaher API call and location call
-
+//TODO fin
