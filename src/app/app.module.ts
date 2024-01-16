@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ActivityProviderService } from './activity-provider.service';
 
 
+
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule],
