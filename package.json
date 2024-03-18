@@ -26,7 +26,7 @@
     "@capacitor/status-bar": "^5.0.0",
     "@ionic-native/geolocation": "^5.0.0-beta.14",
     "@ionic/angular": "^6.1.9",
-    "cordova-plugin-geolocation": "^4.1.0",
+        "cordova-plugin-geolocation": "^4.1.0",
     "ionicons": "^6.0.3",
     "rxjs": "^6.5.3",
     "rxjs-compat": "^6.6.7",
