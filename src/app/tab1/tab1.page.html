@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title class="black-text">
       Forecast
@@ -21,6 +21,41 @@
     </ion-card>
   </div>
   <!-- TODO: Find out why this is only displaying today. -->
+<!-- </ion-content>
+
+<style>
+  .black-text {
+    color: black;
+  }
+</style> --> -->
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="black-text">
+      Forecast
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+  </ion-header>
+  <div *ngFor="let forecast of processedForecastArray">
+    <ion-card [style.background-color]="forecast.precipitationProbability > 50 ? 'red' : 'green'">
+      <ion-card-header>
+        <ion-card-title class="black-text">{{ forecast.day }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-label class="black-text">Temperature: {{ forecast.temperature }}°F</ion-label>
+        <ion-label class="black-text">Daytime: {{ forecast.isDaytime ? 'Yes' : 'No' }}</ion-label>
+        <ion-label class="black-text">Heating Degree Days (HDD): {{ forecast.HDD }}</ion-label>
+        <ion-label class="black-text">Cooling Degree Days (CDD): {{ forecast.CDD }}</ion-label>
+        <ion-label class="black-text">Precipitation Probability: {{ forecast.precipitationProbability }}%</ion-label>
+        <ion-label class="black-text">Estimated Precipitation: {{ forecast.estimatedPrecipitation }} inches</ion-label>
+        <ion-label class="black-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
 
 <style>
@@ -28,3 +63,4 @@
     color: black;
   }
 </style>
+
