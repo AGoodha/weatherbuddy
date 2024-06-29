@@ -130,26 +130,24 @@ export class WeatherApiService {
     if (!location) return;
 
     const apiURL = `https://api.weather.gov/points/${location}`;
-    const firstUrl = await this.http.get(apiURL).toPromise().then((response: any) => response?.properties?.forecast);
+    const forecastUrl = await this.http.get(apiURL).toPromise().then((response: any) => response?.properties?.forecast);
+    
+    const forecastAPI = `${forecastUrl}?units=us&periods=true`
+    const forecastData = await this.http.get(forecastAPI).toPromise();
+    
 
-    console.log("Forecast URL: " + firstUrl);
-    if (!firstUrl) return;
-
-    const result = await this.http.get(firstUrl).toPromise().then(async (response: any) => {
+    console.log("Forecast URL: " + forecastUrl);
+    if (!forecastUrl) return;
+// TODO the NOAA API does return QPF for precipitation value just need to adjust call to get it
+    const result = await this.http.get(forecastUrl).toPromise().then(async (response: any) => {
       const periods: Forecast[] = response?.properties?.periods.map((forecast: any) => {
-        const { temperature, isDaytime, probabilityOfPrecipitation, dewpoint, relativeHumidity } = forecast;
-        const HDD = Math.max(0, this.baseTemperature - temperature);
-        const CDD = Math.max(0, temperature - this.baseTemperature);
+        const { temperature, isDaytime, probabilityOfPrecipitation} = forecast; 
         const precipitationProbability = probabilityOfPrecipitation?.value ?? 0;
-        const estimatedPrecipitation = this.estimatePrecipitation(precipitationProbability, dewpoint.value, relativeHumidity.value);
 
         return {
           temperature,
           isDaytime,
-          HDD,
-          CDD,
           precipitationProbability,
-          estimatedPrecipitation,
           detailedForecast: forecast.detailedForecast
         };
       });
@@ -166,13 +164,6 @@ export class WeatherApiService {
 
     console.log("Weather Data:", result);
     return result;
-  }
-
-  estimatePrecipitation(precipProbability: number, dewPoint: number, humidity: number): number {
-    if (precipProbability === 0) return 0;
-    // Simple model assuming the likelihood of precipitation amount increases with humidity and dew point
-    const precipitation = precipProbability * dewPoint * humidity / 10000;
-    return parseFloat(precipitation.toFixed(2)); // Return a reasonable precision
   }
 
   // async sendWeatherDataToAPI(data: Forecast[]): Promise<any[]> {
