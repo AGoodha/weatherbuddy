@@ -128,22 +128,21 @@ export class WeatherApiService {
   async firstWeatherCall() {
     const location = await this.location();
     if (!location) return;
-
+  
     const apiURL = `https://api.weather.gov/points/${location}`;
     const forecastUrl = await this.http.get(apiURL).toPromise().then((response: any) => response?.properties?.forecast);
     
-    const forecastAPI = `${forecastUrl}?units=us&periods=true`
+    const forecastAPI = `${forecastUrl}?units=us`
     const forecastData = await this.http.get(forecastAPI).toPromise();
     
-
     console.log("Forecast URL: " + forecastUrl);
     if (!forecastUrl) return;
-// TODO the NOAA API does return QPF for precipitation value just need to adjust call to get it
-    const result = await this.http.get(forecastUrl).toPromise().then(async (response: any) => {
+  
+    const result = await this.http.get(forecastAPI).toPromise().then((response: any) => {
       const periods: Forecast[] = response?.properties?.periods.map((forecast: any) => {
         const { temperature, isDaytime, probabilityOfPrecipitation} = forecast; 
         const precipitationProbability = probabilityOfPrecipitation?.value ?? 0;
-
+  
         return {
           temperature,
           isDaytime,
@@ -151,20 +150,13 @@ export class WeatherApiService {
           detailedForecast: forecast.detailedForecast
         };
       });
-      //TODO create end point in AWS hosting ML model to make prediction on trail ridability given this data. 
-      // // Simulate sending weather data to an API and getting a response
-      // const apiResponse = await this.sendWeatherDataToAPI(periods);
-      // if (apiResponse) {
-      //   periods.forEach((forecast: Forecast, index: number) => {
-      //     forecast.mlModelPrediction = apiResponse[index]?.mlModelPrediction || 'No prediction';
-      //   });
-      // }
       return periods;
     });
-
+  
     console.log("Weather Data:", result);
     return result;
   }
+  
 
   // async sendWeatherDataToAPI(data: Forecast[]): Promise<any[]> {
   //   const apiUrl = 'http://your-api-endpoint-ip-address'; // Replace with your actual API endpoint
