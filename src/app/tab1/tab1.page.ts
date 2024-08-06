@@ -88,7 +88,7 @@ export class Tab1Page {
         HDD: forecast.HDD,
         CDD: forecast.CDD,
         precipitationProbability: forecast.precipitationProbability,
-        estimatedPrecipitation: forecast.estimatedPrecipitation,
+        estimatedPrecipitation: forecast.quantitativePrecipitation,
         detailedForecast: forecast.detailedForecast
       };
     });

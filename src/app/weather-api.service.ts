@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { LocationService } from './location.service';
 
 interface ForecastPeriod {
@@ -22,6 +22,14 @@ interface GridData {
       }>
     }
   }
+}
+
+interface Forecast {
+  temperature: number;
+  isDaytime: boolean;
+  precipitationProbability: number;
+  quantitativePrecipitation: number;
+  detailedForecast: string;
 }
 
 @Injectable({
@@ -57,8 +65,8 @@ export class WeatherApiService {
     const forecastData = await this.http.get<any>(forecastUrl).toPromise();
     const gridData = await this.http.get<GridData>(gridDataUrl).toPromise();
 
-    const periods = forecastData.properties.periods.map((forecast: ForecastPeriod) => {
-      const { temperature, isDaytime, probabilityOfPrecipitation, startTime, endTime } = forecast; 
+    const periods: Forecast[] = forecastData.properties.periods.map((forecast: ForecastPeriod) => {
+      const { temperature, isDaytime, probabilityOfPrecipitation, startTime, endTime, detailedForecast } = forecast; 
       const precipitationProbability = probabilityOfPrecipitation?.value ?? 0;
 
       // Find the quantitative precipitation value corresponding to the forecast period
@@ -74,12 +82,47 @@ export class WeatherApiService {
         isDaytime,
         precipitationProbability,
         quantitativePrecipitation: quantitativePrecip,
-        detailedForecast: forecast.detailedForecast
+        detailedForecast
       };
     });
 
     console.log("Weather Data:", periods);
     return periods;
+  }
+
+  generateCSV(forecast: Forecast[]): string {
+    const headers = ['Temperature', 'Is Daytime', 'Precipitation Probability', 'Quantitative Precipitation', 'Detailed Forecast'];
+    const rows = forecast.map(f => [
+      f.temperature,
+      f.isDaytime,
+      f.precipitationProbability,
+      f.quantitativePrecipitation,
+      f.detailedForecast
+    ]);
+
+    let csvContent = headers.join(',') + '\n';
+    rows.forEach(row => {
+      csvContent += row.join(',') + '\n';
+    });
+
+    return csvContent;
+  }
+
+  async sendForecastCSV(endpoint: string) {
+    const forecast = await this.firstWeatherCall();
+    if (!forecast) return;
+
+    const csvData = this.generateCSV(forecast);
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/csv'
+    });
+
+    this.http.post(endpoint, csvData, { headers })
+      .subscribe(response => {
+        console.log('CSV data sent successfully', response);
+      }, error => {
+        console.error('Error sending CSV data', error);
+      });
   }
 
   verifyRunLimiter(timestamp: number) {
