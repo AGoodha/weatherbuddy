@@ -1,66 +1,41 @@
-<!-- <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title class="black-text">
-      Forecast
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-  </ion-header>
-  <div *ngFor="let forecast of processedForecastArray">
-    <ion-card [style.background-color]="forecast.precipitation > 50 ? 'red' : 'green'">
-      <ion-card-header>
-        <ion-card-title class="black-text">{{ forecast.day }}</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-label class="black-text">Temperature: {{forecast.temperature}}°F</ion-label>
-        <ion-label class="black-text">Precipitation: {{forecast.precipitation}}%</ion-label>
-      </ion-card-content>
-    </ion-card>
-  </div>
-  <!-- TODO: Find out why this is only displaying today. -->
-<!-- </ion-content>
-
-<style>
-  .black-text {
-    color: black;
-  }
-</style> --> -->
-
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title class="black-text">
+  <ion-toolbar style="background-color: #4A7C57;">
+    <ion-title class="forest-text">
       Forecast
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" style="background-color: #E6F7E6;">
   <ion-header collapse="condense">
   </ion-header>
   <div *ngFor="let forecast of processedForecastArray">
-    <ion-card [style.background-color]="forecast.precipitationProbability > 50 ? 'red' : 'green'">
+    <ion-card class="forest-card" [ngStyle]="{ 'background-image': forecast.precipitationProbability > 50 ? 'url(assets/heavy-rain-forest.png)' : 'url(assets/light-rain-forest.png)' }">
       <ion-card-header>
-        <ion-card-title class="black-text">{{ forecast.day }}</ion-card-title>
+        <ion-card-title class="forest-text">{{ forecast.day }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <ion-label class="black-text">Temperature: {{ forecast.temperature }}°F</ion-label>
-        <ion-label class="black-text">Daytime: {{ forecast.isDaytime ? 'Yes' : 'No' }}</ion-label>
-        <ion-label class="black-text">Heating Degree Days (HDD): {{ forecast.HDD }}</ion-label>
-        <ion-label class="black-text">Cooling Degree Days (CDD): {{ forecast.CDD }}</ion-label>
-        <ion-label class="black-text">Precipitation Probability: {{ forecast.precipitationProbability }}%</ion-label>
-        <ion-label class="black-text">Estimated Precipitation: {{ forecast.estimatedPrecipitation }} mm</ion-label>
-        <ion-label class="black-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label>
+        <ion-label class="forest-text">Temperature: {{ forecast.temperature }}°F</ion-label><br>
+        <ion-label class="forest-text">Daytime: {{ forecast.isDaytime ? 'Yes' : 'No' }}</ion-label><br>
+        <ion-label class="forest-text">Heating Degree Days (HDD): {{ forecast.HDD }}</ion-label><br>
+        <ion-label class="forest-text">Cooling Degree Days (CDD): {{ forecast.CDD }}</ion-label><br>
+        <ion-label class="forest-text">Precipitation Probability: {{ forecast.precipitationProbability }}%</ion-label><br>
+        <ion-label class="forest-text">Estimated Precipitation: {{ forecast.estimatedPrecipitation }} mm</ion-label><br>
+        <ion-label class="forest-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label>
       </ion-card-content>
     </ion-card>
   </div>
 </ion-content>
 
 <style>
-  .black-text {
-    color: black;
+  .forest-text {
+    color: #f1f6f0;
+    font-family: 'Arial', sans-serif; /* Use a nature-inspired font if available */
+  }
+  .forest-card {
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center;
+    color: white; /* Change text color for better contrast */
   }
 </style>
-

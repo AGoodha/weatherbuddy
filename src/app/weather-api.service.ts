@@ -30,6 +30,8 @@ interface Forecast {
   precipitationProbability: number;
   quantitativePrecipitation: number;
   detailedForecast: string;
+  predictedSoilMoisture?: number; // Added property for predicted soil moisture
+  Predicted_SoilMoisture?: number; // New property added
 }
 
 @Injectable({
@@ -87,17 +89,18 @@ export class WeatherApiService {
     });
 
     console.log("Weather Data:", periods);
+
+    // Call sendForecastCSV with the forecast data
+    await this.sendForecastCSV(periods);
+
     return periods;
   }
 
   generateCSV(forecast: Forecast[]): string {
-    const headers = ['Temperature', 'Is Daytime', 'Precipitation Probability', 'Quantitative Precipitation', 'Detailed Forecast'];
+    const headers = ['Precipitation', 'Temperature'];
     const rows = forecast.map(f => [
-      f.temperature,
-      f.isDaytime,
-      f.precipitationProbability,
       f.quantitativePrecipitation,
-      f.detailedForecast
+      f.temperature
     ]);
 
     let csvContent = headers.join(',') + '\n';
@@ -108,8 +111,27 @@ export class WeatherApiService {
     return csvContent;
   }
 
-  async sendForecastCSV(endpoint: string) {
-    const forecast = await this.firstWeatherCall();
+  private extractPredictedSoilMoisture(response: any): number {
+    // Assuming the response is a CSV string, split it into lines
+    const lines = response.split('\n');
+    
+    // Get the last line which contains the predicted soil moisture
+    const lastLine = lines[lines.length - 1];
+    
+    // Split the last line by commas and extract the Predicted_SoilMoisture value
+    const values = lastLine.split(',');
+    
+    // Assuming Predicted_SoilMoisture is the last value in the response
+    return parseFloat(values[values.length - 1]);
+  }
+
+  private updateForecastWithSoilMoisture(forecast: Forecast[], predictedSoilMoisture: number) {
+    // Update each forecast entry with the predicted soil moisture
+    forecast.forEach(item => {
+      item['Predicted_SoilMoisture'] = predictedSoilMoisture; // Add the predicted soil moisture to each item
+    });
+  }
+  async sendForecastCSV(forecast: Forecast[]) {
     if (!forecast) return;
 
     const csvData = this.generateCSV(forecast);
@@ -117,18 +139,18 @@ export class WeatherApiService {
       'Content-Type': 'text/csv'
     });
 
+    const endpoint = 'http://137.184.9.15:5000/predict';
+    console.log('csvdata', csvData);
+    
     this.http.post(endpoint, csvData, { headers })
       .subscribe(response => {
         console.log('CSV data sent successfully', response);
-      }, error => {
-        console.error('Error sending CSV data', error);
+        
+        // Process the response to extract Predicted_SoilMoisture
+        const predictedSoilMoisture = this.extractPredictedSoilMoisture(response);
+        
+        // Update the forecast data with the predicted soil moisture
+        this.updateForecastWithSoilMoisture(forecast, predictedSoilMoisture);
       });
-  }
-
-  verifyRunLimiter(timestamp: number) {
-    const firstTenSeconds = timestamp + 1000000;
-    const execute = timestamp <= firstTenSeconds;
-    console.log("Ten second limit:", firstTenSeconds);
-    return execute;
   }
 }
