@@ -111,26 +111,35 @@ export class WeatherApiService {
     return csvContent;
   }
 
-  private extractPredictedSoilMoisture(response: any): number {
-    // Assuming the response is a CSV string, split it into lines
-    const lines = response.split('\n');
+  private extractPredictedSoilMoisture(response: any): number[] {
+    // Assuming the response is a JSON string, parse it into an object
+    const data = JSON.parse(response);
     
-    // Get the last line which contains the predicted soil moisture
-    const lastLine = lines[lines.length - 1];
+    // Check if data is an array
+    if (Array.isArray(data)) {
+        // Map through the array to extract the Predicted_SoilMoisture values
+        const predictedValues = data.map(entry => parseFloat(entry.Predicted_SoilMoisture));
+        
+        // Return the array of predicted values
+        return predictedValues;
+    }
     
-    // Split the last line by commas and extract the Predicted_SoilMoisture value
-    const values = lastLine.split(',');
-    
-    // Assuming Predicted_SoilMoisture is the last value in the response
-    return parseFloat(values[values.length - 1]);
-  }
+    // Return an empty array if the data is not in the expected format
+    return [];
+}
 
-  private updateForecastWithSoilMoisture(forecast: Forecast[], predictedSoilMoisture: number) {
-    // Update each forecast entry with the predicted soil moisture
-    forecast.forEach(item => {
-      item['Predicted_SoilMoisture'] = predictedSoilMoisture; // Add the predicted soil moisture to each item
-    });
+
+
+private updateForecastWithSoilMoisture(forecast: Forecast[], predictedSoilMoisture: number[]): void {
+  // Ensure that the forecast and predicted values have the same length
+  const length = Math.min(forecast.length, predictedSoilMoisture.length);
+
+  // Update each forecast entry with the corresponding predicted soil moisture
+  for (let i = 0; i < length; i++) {
+      forecast[i]['Predicted_SoilMoisture'] = predictedSoilMoisture[i]; // Add the predicted soil moisture to each item
   }
+}
+
   async sendForecastCSV(forecast: Forecast[]) {
     if (!forecast) return;
 
@@ -148,9 +157,10 @@ export class WeatherApiService {
         
         // Process the response to extract Predicted_SoilMoisture
         const predictedSoilMoisture = this.extractPredictedSoilMoisture(response);
-        
+        console.log('predicted soilvalue', predictedSoilMoisture);
         // Update the forecast data with the predicted soil moisture
         this.updateForecastWithSoilMoisture(forecast, predictedSoilMoisture);
+        console.log('Forecastwith predicted soil', forecast);
       });
   }
 }
