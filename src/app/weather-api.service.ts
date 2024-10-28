@@ -55,7 +55,7 @@ export class WeatherApiService {
   async firstWeatherCall() {
     const location = await this.location();
     if (!location) return;
-
+  
     const apiURL = `https://api.weather.gov/points/${location}`;
     const gridDataUrl = await this.http.get<any>(apiURL).toPromise().then(response => response.properties.forecastGridData);
     const forecastUrl = await this.http.get<any>(apiURL).toPromise().then(response => response.properties.forecast);
@@ -63,14 +63,14 @@ export class WeatherApiService {
     console.log("Grid Data URL: " + gridDataUrl);
     console.log("Forecast URL: " + forecastUrl);
     if (!gridDataUrl || !forecastUrl) return;
-
+  
     const forecastData = await this.http.get<any>(forecastUrl).toPromise();
     const gridData = await this.http.get<GridData>(gridDataUrl).toPromise();
-
+  
     const periods: Forecast[] = forecastData.properties.periods.map((forecast: ForecastPeriod) => {
       const { temperature, isDaytime, probabilityOfPrecipitation, startTime, endTime, detailedForecast } = forecast; 
       const precipitationProbability = probabilityOfPrecipitation?.value ?? 0;
-
+  
       // Find the quantitative precipitation value corresponding to the forecast period
       const quantitativePrecip = gridData.properties.quantitativePrecipitation.values.find(precip => {
         const precipStartTime = new Date(precip.validTime.split('/')[0]);
@@ -78,7 +78,7 @@ export class WeatherApiService {
         const forecastEndTime = new Date(endTime);
         return precipStartTime >= forecastStartTime && precipStartTime < forecastEndTime;
       })?.value ?? 0;
-
+  
       return {
         temperature,
         isDaytime,
@@ -87,13 +87,13 @@ export class WeatherApiService {
         detailedForecast
       };
     });
-
+  
     console.log("Weather Data:", periods);
-
-    // Call sendForecastCSV with the forecast data
+  
+    // Call sendForecastCSV with the forecast data and wait for it to complete
     await this.sendForecastCSV(periods);
-
-    return periods;
+  
+    return periods; // Now this will return after predicted soil moisture is added
   }
 
   generateCSV(forecast: Forecast[]): string {
@@ -140,27 +140,30 @@ private updateForecastWithSoilMoisture(forecast: Forecast[], predictedSoilMoistu
   }
 }
 
-  async sendForecastCSV(forecast: Forecast[]) {
-    if (!forecast) return;
+async sendForecastCSV(forecast: Forecast[]): Promise<void> {
+  if (!forecast) return;
 
-    const csvData = this.generateCSV(forecast);
-    const headers = new HttpHeaders({
-      'Content-Type': 'text/csv'
-    });
+  const csvData = this.generateCSV(forecast);
+  const headers = new HttpHeaders({
+    'Content-Type': 'text/csv'
+  });
 
-    const endpoint = 'http://137.184.9.15:5000/predict';
-    console.log('csvdata', csvData);
-    
-    this.http.post(endpoint, csvData, { headers })
-      .subscribe(response => {
-        console.log('CSV data sent successfully', response);
-        
-        // Process the response to extract Predicted_SoilMoisture
-        const predictedSoilMoisture = this.extractPredictedSoilMoisture(response);
-        console.log('predicted soilvalue', predictedSoilMoisture);
-        // Update the forecast data with the predicted soil moisture
-        this.updateForecastWithSoilMoisture(forecast, predictedSoilMoisture);
-        console.log('Forecastwith predicted soil', forecast);
-      });
+  const endpoint = 'http://137.184.9.15:5000/predict';
+  console.log('CSV Data:', csvData);
+
+  try {
+    const response = await this.http.post(endpoint, csvData, { headers }).toPromise();
+    console.log('CSV data sent successfully', response);
+
+    // Process the response to extract predicted soil moisture
+    const predictedSoilMoisture = this.extractPredictedSoilMoisture(response);
+    console.log('Predicted Soil Moisture:', predictedSoilMoisture);
+
+    // Update the forecast data with the predicted soil moisture
+    this.updateForecastWithSoilMoisture(forecast, predictedSoilMoisture);
+    console.log('Forecast with predicted soil moisture:', forecast);
+  } catch (error) {
+    console.error('Error sending CSV data', error);
   }
+}
 }

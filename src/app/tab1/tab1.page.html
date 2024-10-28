@@ -21,10 +21,11 @@
         <ion-label class="forest-text">Cooling Degree Days (CDD): {{ forecast.CDD }}</ion-label><br>
         <ion-label class="forest-text">Precipitation Probability: {{ forecast.precipitationProbability }}%</ion-label><br>
         <ion-label class="forest-text">Estimated Precipitation: {{ forecast.estimatedPrecipitation }} mm</ion-label><br>
-        <ion-label class="forest-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label>
+        <ion-label class="forest-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label><br>
+        <ion-label class="forest-text">Predicted Soil Moisture: {{ forecast.predictedSoilMoisture }}%</ion-label><br>
       </ion-card-content>
-    </ion-card>
-  </div>
+    </ion-card> <!-- Closing ion-card here -->
+  </div> <!-- Closing div here -->
 </ion-content>
 
 <style>
