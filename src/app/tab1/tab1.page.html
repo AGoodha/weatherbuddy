@@ -11,6 +11,7 @@
   </ion-header>
   <div *ngFor="let forecast of processedForecastArray">
     <ion-card class="forest-card" [ngStyle]="{ 'background-image': forecast.precipitationProbability > 50 ? 'url(assets/heavy-rain-forest.png)' : 'url(assets/light-rain-forest.png)' }">
+      <div *ngIf="forecast.precipitationProbability > 50" class="red-tint"></div>
       <ion-card-header>
         <ion-card-title class="forest-text">{{ forecast.day }}</ion-card-title>
       </ion-card-header>
@@ -22,7 +23,7 @@
         <ion-label class="forest-text">Precipitation Probability: {{ forecast.precipitationProbability }}%</ion-label><br>
         <ion-label class="forest-text">Estimated Precipitation: {{ forecast.estimatedPrecipitation }} mm</ion-label><br>
         <ion-label class="forest-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label><br>
-        <ion-label class="forest-text">Predicted Soil Moisture: {{ forecast.predictedSoilMoisture }}%</ion-label><br>
+        <ion-label class="forest-text">Predicted Soil Moisture: {{ forecast.predictedSoilMoisture ? forecast.predictedSoilMoisture + '%' : 'Gathering data, provide prediction soon' }}</ion-label><br>
       </ion-card-content>
     </ion-card> <!-- Closing ion-card here -->
   </div> <!-- Closing div here -->
@@ -38,5 +39,15 @@
     background-size: cover;
     background-position: center;
     color: white; /* Change text color for better contrast */
+    position: relative; /* Position relative for overlay */
+  }
+  .red-tint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 0, 0, 0.5); /* Red tint with transparency */
+    border-radius: 10px; /* Match the card's border radius */
   }
 </style>

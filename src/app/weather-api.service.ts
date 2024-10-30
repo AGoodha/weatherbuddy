@@ -86,7 +86,7 @@ export class WeatherApiService {
         quantitativePrecipitation: quantitativePrecip,
         detailedForecast
       };
-    });
+    }).filter((forecast: Forecast) => forecast.isDaytime); // Explicitly define the type here
   
     console.log("Weather Data:", periods);
   
@@ -126,44 +126,44 @@ export class WeatherApiService {
     
     // Return an empty array if the data is not in the expected format
     return [];
-}
+  }
+
+  private updateForecastWithSoilMoisture(forecast: Forecast[], predictedSoilMoisture: number[]): void {
+    // Ensure that the forecast and predicted values have the same length
+    const length = Math.min(forecast.length, predictedSoilMoisture.length);
+
+    // Update each forecast entry with the corresponding predicted soil moisture
+    for (let i = 0; i < length; i++) {
+        forecast[i]['Predicted_SoilMoisture'] = predictedSoilMoisture[i]; // Add the predicted soil moisture to each item
+    }
+  }
+
+  async sendForecastCSV(forecast: Forecast[]): Promise<void> {
+    if (!forecast) return;
+
+    const csvData = this.generateCSV(forecast);
+    const headers = new HttpHeaders({
+      'Content-Type': 'text/csv'
+    });
+
+    const endpoint = 'http://137.184.9.15:5000/predict';
+    console.log('CSV Data:', csvData);
+
+    try {
+      const response = await this.http.post(endpoint, csvData, { headers }).toPromise();
+      console.log('CSV data sent successfully', response);
 
 
+      // Process the response to extract predicted soil moisture
+      const predictedSoilMoisture = this.extractPredictedSoilMoisture(response);
+      console.log('Predicted Soil Moisture:', predictedSoilMoisture);
 
-private updateForecastWithSoilMoisture(forecast: Forecast[], predictedSoilMoisture: number[]): void {
-  // Ensure that the forecast and predicted values have the same length
-  const length = Math.min(forecast.length, predictedSoilMoisture.length);
-
-  // Update each forecast entry with the corresponding predicted soil moisture
-  for (let i = 0; i < length; i++) {
-      forecast[i]['Predicted_SoilMoisture'] = predictedSoilMoisture[i]; // Add the predicted soil moisture to each item
+      // Update the forecast data with the predicted soil moisture
+      this.updateForecastWithSoilMoisture(forecast, predictedSoilMoisture);
+      console.log('Forecast with predicted soil moisture:', forecast);
+    } catch (error) {
+      console.error('Error sending CSV data', error);
+    }
   }
 }
 
-async sendForecastCSV(forecast: Forecast[]): Promise<void> {
-  if (!forecast) return;
-
-  const csvData = this.generateCSV(forecast);
-  const headers = new HttpHeaders({
-    'Content-Type': 'text/csv'
-  });
-
-  const endpoint = 'http://137.184.9.15:5000/predict';
-  console.log('CSV Data:', csvData);
-
-  try {
-    const response = await this.http.post(endpoint, csvData, { headers }).toPromise();
-    console.log('CSV data sent successfully', response);
-
-    // Process the response to extract predicted soil moisture
-    const predictedSoilMoisture = this.extractPredictedSoilMoisture(response);
-    console.log('Predicted Soil Moisture:', predictedSoilMoisture);
-
-    // Update the forecast data with the predicted soil moisture
-    this.updateForecastWithSoilMoisture(forecast, predictedSoilMoisture);
-    console.log('Forecast with predicted soil moisture:', forecast);
-  } catch (error) {
-    console.error('Error sending CSV data', error);
-  }
-}
-}
