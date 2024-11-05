@@ -186,7 +186,7 @@ export class WeatherApiService {
           'Content-Type': 'text/csv'
         });
     
-        const endpoint = 'https://137.184.9.15:5000/predict';
+        const endpoint = 'https://137.184.9.15/predict';
         console.log('CSV Data:', csvData);
     
         try {
