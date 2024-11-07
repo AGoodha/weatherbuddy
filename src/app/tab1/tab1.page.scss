@@ -1,0 +1,13 @@
+.forest-text {
+    color: black; /* Set text color to black */
+  }
+  .red-tint {
+    position: absolute; // Ensure it overlays correctly
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 0, 0, 0.5); // Red tint with 50% opacity
+    z-index: 1; // Ensure it appears above other content
+  }
+  

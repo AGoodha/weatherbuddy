@@ -9,12 +9,18 @@
 <ion-content>
   <!-- Activity Input Form -->
   <ion-item>
-    <ion-label position="floating">Activity Name</ion-label>
+    <ion-label position="floating">Activity Thresholds</ion-label>
     <ion-input type="text" [(ngModel)]="activityName"></ion-input>
   </ion-item>
 
+  <!-- AI Prediction Message -->
   <ion-item>
-    <ion-label position="floating">Times per Week</ion-label>
+    <ion-label>
+      Soil Moisture is predicted by AI. It will learn from your local climate. Take note of the value you see in the predictions section and set the relevant threshold here.    </ion-label>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Soil Moisture Percent</ion-label>
     <ion-input type="number" [(ngModel)]="activityFrequency"></ion-input>
   </ion-item>
 
@@ -23,13 +29,13 @@
     <ion-input type="number" [(ngModel)]="precipitationThreshold"></ion-input>
   </ion-item>
 
-  <ion-button expand="full" (click)="saveActivity()">Save Activity</ion-button>
+  <ion-button expand="full" (click)="saveActivity()">Save Thresholds</ion-button>
 
   <!-- List of Saved Activities -->
   <ion-list>
     <ion-item *ngFor="let activity of activities; let i = index">
       <ion-label>
-        {{ activity.name }} - {{ activity.frequency }} times/week - {{ activity.precipitationThreshold }}% precipitation
+        {{ activity.name }} - {{ activity.frequency }} % Soil Mouisture - {{ activity.precipitationThreshold }}% precipitation
       </ion-label>
       <ion-button color="danger" (click)="deleteActivity(activity.id)">Delete</ion-button>
     </ion-item>

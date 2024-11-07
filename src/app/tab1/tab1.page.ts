@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { WeatherApiService } from '../weather-api.service';
+import { ActivityProviderService } from '../activity-provider.service'; // Import the service
 
 @Component({
   selector: 'app-tab1',
@@ -8,10 +9,16 @@ import { WeatherApiService } from '../weather-api.service';
 })
 export class Tab1Page {
   forecastArray: any = [];
-  processedForecastArray: any[] = []; // Declare the property here
+  processedForecastArray: any[] = [];
+  activityFrequency: number = 0;
+  precipitationThreshold: number = 0;
 
-  constructor(public weatherApiService: WeatherApiService) {
-    this.weatherCall(); // Ensuring the call is made when the component is initialized
+  constructor(
+    public weatherApiService: WeatherApiService,
+    private activityProviderService: ActivityProviderService // Inject the service
+  ) {
+    this.weatherCall();
+    this.getActivityThresholds();
   }
 
   weatherCall() {
@@ -26,9 +33,8 @@ export class Tab1Page {
 
   processForecastArray() {
     this.processedForecastArray = this.forecastArray.map((forecast: any) => {
-      // Assuming forecast contains all necessary properties directly
       return {
-        day: forecast.name, // Name of the period, e.g., "Today"
+        day: forecast.name,
         temperature: forecast.temperature,
         isDaytime: forecast.isDaytime,
         HDD: forecast.HDD,
@@ -41,5 +47,20 @@ export class Tab1Page {
     });
 
     console.log("Processed Forecast Data: ", this.processedForecastArray);
+  }
+
+  async getActivityThresholds() {
+    const lastActivity = await this.getLastSavedActivity(); // Await the method to get the last activity
+    if (lastActivity) {
+      this.activityFrequency = lastActivity.frequency;
+      this.precipitationThreshold = lastActivity.precipitationThreshold;
+      console.log("Activity Frequency: ", this.activityFrequency);
+      console.log("Precipitation Threshold: ", this.precipitationThreshold);
+    }
+  }
+
+  async getLastSavedActivity() {
+    const activities = await this.activityProviderService.getActivities(); // Get all activities
+    return activities.length > 0 ? activities[activities.length - 1] : null; // Return the last activity if exists
   }
 }

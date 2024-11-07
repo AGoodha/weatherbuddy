@@ -1,17 +1,20 @@
-<ion-header [translucent]="true">
-  <ion-toolbar style="background-color: #4A7C57;">
-    <ion-title class="forest-text">
-      Forecast
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true" style="background-color: #E6F7E6;">
+<ion-content [fullscreen]="true" style="background-color: #e3fae3;">
   <ion-header collapse="condense">
   </ion-header>
   <div *ngFor="let forecast of processedForecastArray">
-    <ion-card class="forest-card" [ngStyle]="{ 'background-image': forecast.precipitationProbability > 50 ? 'url(assets/heavy-rain-forest.png)' : 'url(assets/light-rain-forest.png)' }">
-      <div *ngIf="forecast.precipitationProbability > 50" class="red-tint"></div>
+    <ion-card class="forest-card" 
+              style="position: relative;" 
+              [ngStyle]="{ 
+                'background-image': 
+                  ((forecast.precipitationProbability < precipitationThreshold || forecast.precipitationProbability === 0)  && 
+                   (forecast.predictedSoilMoisture < activityFrequency || forecast.predictedSoilMoisture === undefined)) 
+                  ? 'url(assets/light-rain-forest.png)' 
+                  : 'url(assets/heavy-rain-forest.png)' 
+              }">
+
+      <div *ngIf="(forecast.predictedSoilMoisture !== undefined && forecast.predictedSoilMoisture >= activityFrequency) || forecast.precipitationProbability >= precipitationThreshold" class="red-tint">
+      </div>
+
       <ion-card-header>
         <ion-card-title class="forest-text">{{ forecast.day }}</ion-card-title>
       </ion-card-header>
@@ -23,31 +26,8 @@
         <ion-label class="forest-text">Precipitation Probability: {{ forecast.precipitationProbability }}%</ion-label><br>
         <ion-label class="forest-text">Estimated Precipitation: {{ forecast.estimatedPrecipitation }} mm</ion-label><br>
         <ion-label class="forest-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label><br>
-        <ion-label class="forest-text">Predicted Soil Moisture: {{ forecast.predictedSoilMoisture ? forecast.predictedSoilMoisture + '%' : 'Gathering data, provide prediction soon' }}</ion-label><br>
+        <ion-label class="forest-text">Predicted Soil Moisture: {{ forecast.predictedSoilMoisture !== undefined ? forecast.predictedSoilMoisture + '%' : 'Gathering data, provide prediction soon' }}</ion-label><br>
       </ion-card-content>
-    </ion-card> <!-- Closing ion-card here -->
-  </div> <!-- Closing div here -->
+    </ion-card>
+  </div>
 </ion-content>
-
-<style>
-  .forest-text {
-    color: #f1f6f0;
-    font-family: 'Arial', sans-serif; /* Use a nature-inspired font if available */
-  }
-  .forest-card {
-    border-radius: 10px;
-    background-size: cover;
-    background-position: center;
-    color: white; /* Change text color for better contrast */
-    position: relative; /* Position relative for overlay */
-  }
-  .red-tint {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 0, 0, 0.5); /* Red tint with transparency */
-    border-radius: 10px; /* Match the card's border radius */
-  }
-</style>

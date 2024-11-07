@@ -22,7 +22,8 @@
       "es2018", 
       "dom"
     ],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "allowSyntheticDefaultImports": true // Add this line
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

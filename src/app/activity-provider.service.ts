@@ -1,57 +1,44 @@
 import { Injectable } from '@angular/core';
-import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
+import localforage from 'localforage';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ActivityProviderService {
-  private db: SQLiteDBConnection | null = null;
+  private dbName: string = 'activities';
   private dbReady: Promise<void>;
-  private dbName: string = 'activities.db';
 
   constructor() {
     this.dbReady = this.initDB();
   }
 
   private async initDB() {
-    try {
-      const sqlite = new SQLiteConnection(CapacitorSQLite);
-      this.db = await sqlite.createConnection(this.dbName, false, 'no-encryption', 1, false);
-      await this.db.open();
-      await this.db.execute(`CREATE TABLE IF NOT EXISTS activities (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        frequency INTEGER,
-        precipitationThreshold INTEGER
-      );`);
-    } catch (error) {
-      console.error('Error during DB initialization:', error);
-    }
+    // Set up LocalForage configuration
+    localforage.config({
+      name: this.dbName,
+      storeName: 'activities' // Should be alphanumeric, with underscores
+    });
   }
 
-  async saveActivity(activity: { name: string; frequency: number; precipitationThreshold: number; }): Promise<void> {
+  async saveActivity(activity: { id?: number; name: string; frequency: number; precipitationThreshold: number; }): Promise<void> {
     await this.dbReady;
-    const statement = `INSERT INTO activities (name, frequency, precipitationThreshold) VALUES (?, ?, ?)`;
-    if (this.db) {
-      await this.db.run(statement, [activity.name, activity.frequency, activity.precipitationThreshold]);
-    }
+    // Use the activity's id as the key, or generate a new one if not provided
+    const key = activity.id ? activity.id.toString() : Date.now().toString();
+    await localforage.setItem(key, activity);
   }
 
-  async getActivities(): Promise<any[] | undefined> {
+  async getActivities(): Promise<any[]> {
     await this.dbReady;
-    const statement = `SELECT * FROM activities`;
-    if (this.db) {
-      const result = await this.db.query(statement);
-      return result?.values;
-    }
-    return undefined;
+    const activities: any[] = [];
+    // Iterate through all items in the store
+    await localforage.iterate((value, key) => {
+      activities.push(value);
+    });
+    return activities;
   }
 
   async deleteActivity(activityId: number): Promise<void> {
     await this.dbReady;
-    const statement = `DELETE FROM activities WHERE id = ?`;
-    if (this.db) {
-      await this.db.run(statement, [activityId]);
-    }
+    await localforage.removeItem(activityId.toString());
   }
 }
