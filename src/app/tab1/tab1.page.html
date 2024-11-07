@@ -3,13 +3,13 @@
   </ion-header>
   <div *ngFor="let forecast of processedForecastArray">
     <ion-card class="forest-card" 
-              style="position: relative;" 
+              style="position: relative; background-size: cover; background-position: center;" 
               [ngStyle]="{ 
                 'background-image': 
-                  ((forecast.precipitationProbability < precipitationThreshold || forecast.precipitationProbability === 0)  && 
-                   (forecast.predictedSoilMoisture < activityFrequency || forecast.predictedSoilMoisture === undefined)) 
-                  ? 'url(assets/light-rain-forest.png)' 
-                  : 'url(assets/heavy-rain-forest.png)' 
+                  ((forecast.precipitationProbability < precipitationThreshold || forecast.precipitationProbability === 0) && 
+                   (forecast.predictedSoilMoisture < activityFrequency || forecast.predictedSoilMoisture === undefined || forecast.predictedSoilMoisture === 'Gathering data, provide prediction soon')) 
+                  ? 'url(assets/bike.png)' 
+                  : 'url(assets/light-rain-forest.png)' 
               }">
 
       <div *ngIf="(forecast.predictedSoilMoisture !== undefined && forecast.predictedSoilMoisture >= activityFrequency) || forecast.precipitationProbability >= precipitationThreshold" class="red-tint">
@@ -20,9 +20,6 @@
       </ion-card-header>
       <ion-card-content>
         <ion-label class="forest-text">Temperature: {{ forecast.temperature }}°F</ion-label><br>
-        <ion-label class="forest-text">Daytime: {{ forecast.isDaytime ? 'Yes' : 'No' }}</ion-label><br>
-        <ion-label class="forest-text">Heating Degree Days (HDD): {{ forecast.HDD }}</ion-label><br>
-        <ion-label class="forest-text">Cooling Degree Days (CDD): {{ forecast.CDD }}</ion-label><br>
         <ion-label class="forest-text">Precipitation Probability: {{ forecast.precipitationProbability }}%</ion-label><br>
         <ion-label class="forest-text">Estimated Precipitation: {{ forecast.estimatedPrecipitation }} mm</ion-label><br>
         <ion-label class="forest-text">Forecast Details: {{ forecast.detailedForecast }}</ion-label><br>
