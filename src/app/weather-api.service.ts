@@ -152,8 +152,8 @@ export class WeatherApiService {
       }
     
       private extractPredictedSoilMoisture(response: any): number[] {
-        // Assuming the response is a JSON string, parse it into an object
-        const data = JSON.parse(response);
+        // Assuming the response is a JSON object already
+        const data = response;
         
         // Check if data is an array
         if (Array.isArray(data)) {
